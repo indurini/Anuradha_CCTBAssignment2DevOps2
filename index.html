@@ -3,15 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>My Team Registration</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 40px;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #submit {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #submit:hover {
+      background-color: #0056b3;
+    }
+
+    #success {
+      color: green;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>Team Registration Form</h1>
   <form id="registrationForm">
-    <label>Name: <input type="text" id="name" /></label><br>
-    <label>Email: <input type="email" id="email" /></label><br>
-    <label>Role: <input type="text" id="role" /></label><br>
-    <button type="submit">Register</button>
+    <label>Name: <input type="text" id="name" name="name" /></label><br>
+    <label>Email: <input type="email" id="email" name="email" /></label><br>
+    <label>Role: <input type="text" id="role" name="role" /></label><br>
+    <button type="submit" id="submit">Register</button>
   </form>
   <script src="main.js"></script>
 </body>
