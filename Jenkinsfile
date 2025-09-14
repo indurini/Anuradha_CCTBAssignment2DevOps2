@@ -6,13 +6,14 @@ pipeline {
         TESTING_SERVER = '50.17.114.180'   // WebServer EC2
         PRODUCTION_SERVER = 'xx.xx.xx.xx'  // TODO: Replace with actual Prod server IP
         DEPLOY_PATH = '/var/www/html'
-        SSH_KEY = '/var/lib/jenkins/.ssh/AWS-KEY.pem' // path to your private key
+        SSH_KEY = '~/.ssh/AWS-KEY.pem'     // Jenkins will expand ~ to jenkins home
     }
 
     stages {
         stage('Build') {
             steps {
                 echo '🔧 Building Website...'
+                // Add actual build commands here, e.g., npm install
                 sh 'echo "No build step defined yet (e.g., npm install)"'
             }
         }
@@ -48,16 +49,3 @@ pipeline {
             steps {
                 echo ' Deploying to Production Server...'
                 sh """
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
-                """
-            }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline finished with status: ${currentBuild.currentResult}"
-        }
-    }
-}
