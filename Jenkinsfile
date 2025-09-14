@@ -19,10 +19,12 @@ pipeline {
         stage('Deploy to Testing') {
             steps {
                 echo ' Deploying to Testing Server...'
-                sh """
-                    ssh ec2-user@$TESTING_SERVER "sudo rm -rf $DEPLOY_PATH/*"
-                    ssh ec2-user@$TESTING_SERVER "git clone $REPO_URL $DEPLOY_PATH"
-                """
+                sshagent(['aws-ssh-key']) { // Use the ID of your Jenkins SSH credential
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "sudo rm -rf $DEPLOY_PATH/*"
+                        ssh -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "git clone $REPO_URL $DEPLOY_PATH"
+                    """
+                }
             }
         }
 
@@ -41,16 +43,17 @@ pipeline {
         stage('Deploy to Production') {
             when {
                 expression {
-                    // Only deploy if build is successful
                     currentBuild.resultIsBetterOrEqualTo('SUCCESS')
                 }
             }
             steps {
                 echo ' Deploying to Production Server...'
-                sh """
-                    ssh ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
-                    ssh ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
-                """
+                sshagent(['aws-ssh-key']) { // Use the same credential or another if different
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
+                        ssh -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
+                    """
+                }
             }
         }
     }
