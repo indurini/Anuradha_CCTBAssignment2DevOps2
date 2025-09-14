@@ -6,6 +6,7 @@ pipeline {
         TESTING_SERVER = '50.17.114.180'   // WebServer EC2
         PRODUCTION_SERVER = 'xx.xx.xx.xx'  // TODO: Replace with actual Prod server IP
         DEPLOY_PATH = '/var/www/html'
+        SSH_KEY = '/var/lib/jenkins/.ssh/AWS-KEY.pem' // path to your private key
     }
 
     stages {
@@ -19,12 +20,10 @@ pipeline {
         stage('Deploy to Testing') {
             steps {
                 echo ' Deploying to Testing Server...'
-                sshagent(['aws-ssh-key']) { // Use the ID of your Jenkins SSH credential
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "sudo rm -rf $DEPLOY_PATH/*"
-                        ssh -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "git clone $REPO_URL $DEPLOY_PATH"
-                    """
-                }
+                sh """
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "sudo rm -rf $DEPLOY_PATH/*"
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "git clone $REPO_URL $DEPLOY_PATH"
+                """
             }
         }
 
@@ -48,12 +47,10 @@ pipeline {
             }
             steps {
                 echo ' Deploying to Production Server...'
-                sshagent(['aws-ssh-key']) { // Use the same credential or another if different
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
-                        ssh -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
-                    """
-                }
+                sh """
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
+                """
             }
         }
     }
