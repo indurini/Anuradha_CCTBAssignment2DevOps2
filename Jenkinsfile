@@ -19,7 +19,7 @@ pipeline {
 
         stage('Deploy to Testing') {
             steps {
-                echo ' Deploying to Testing Server...'
+                echo '🚀 Deploying to Testing Server...'
                 sh """
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "sudo rm -rf $DEPLOY_PATH/*"
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$TESTING_SERVER "git clone $REPO_URL $DEPLOY_PATH"
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Run Selenium Tests') {
             steps {
-                echo ' Running Selenium Tests...'
+                echo '🧪 Running Selenium Tests...'
                 script {
                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
                         sh 'node selenium-tests/test_form.js'
@@ -44,7 +44,18 @@ pipeline {
                 expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
             }
             steps {
-                echo ' Deploying to Production Server...'
+                echo '🚀 Deploying to Production Server...'
                 sh """
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished with status: ${currentBuild.currentResult}"
+        }
+    }
+}
