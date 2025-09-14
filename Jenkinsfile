@@ -3,17 +3,16 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/indurini/Anuradha_CCTBAssignment2DevOps2.git'
-        TESTING_SERVER = '50.17.114.180'   // WebServer EC2
-        PRODUCTION_SERVER = 'xx.xx.xx.xx'  // TODO: Replace with actual Prod server IP
+        TESTING_SERVER = '50.17.114.180'
+        PRODUCTION_SERVER = 'xx.xx.xx.xx'
         DEPLOY_PATH = '/var/www/html'
-        SSH_KEY = '~/.ssh/AWS-KEY.pem'     // Jenkins will expand ~ to jenkins home
+        SSH_KEY = '/var/lib/jenkins/.ssh/AWS-KEY.pem'
     }
 
     stages {
         stage('Build') {
             steps {
                 echo '🔧 Building Website...'
-                // Add actual build commands here, e.g., npm install
                 sh 'echo "No build step defined yet (e.g., npm install)"'
             }
         }
@@ -42,10 +41,10 @@ pipeline {
 
         stage('Deploy to Production') {
             when {
-                expression {
-                    currentBuild.resultIsBetterOrEqualTo('SUCCESS')
-                }
+                expression { currentBuild.resultIsBetterOrEqualTo('SUCCESS') }
             }
             steps {
                 echo ' Deploying to Production Server...'
                 sh """
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "sudo rm -rf $DEPLOY_PATH/*"
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@$PRODUCTION_SERVER "git clone $REPO_URL $DEPLOY_PATH"
